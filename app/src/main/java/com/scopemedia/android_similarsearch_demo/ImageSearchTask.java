@@ -51,17 +51,18 @@ class ImageSearchTask extends AsyncTask<String, Void, MediaResponse> {
             SimilarImageRequest request = new SimilarImageRequest();
             request.setMediaAsBase64(encodedImage);
             MediaResponse response = client.getSimilarImages(request).performSync();
-            if (response == null || !response.getStatus().equals("OK")) {
+            if (response == null || response.getCode() != 200) {
                 error = true;
-            } else {
-                return response;
             }
-
+            return response;
         } catch (IOException e) {
             e.printStackTrace();
             error = true;
+            MediaResponse errRes = new MediaResponse();
+            errRes.setCode(-1);
+            errRes.setMessage(e.getMessage());
+            return errRes;
         }
-        return null;
     }
 
     @Override
@@ -69,7 +70,7 @@ class ImageSearchTask extends AsyncTask<String, Void, MediaResponse> {
         super.onPostExecute(response);
 
         if (error)
-            callback.error(response.getError());
+            callback.error(response.getMessage());
         else {
             callback.result(response);
         }
