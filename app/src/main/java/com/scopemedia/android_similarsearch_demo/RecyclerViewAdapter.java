@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.scopemedia.api.dto.Media;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -17,10 +18,10 @@ import java.util.List;
 
 class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.RecyclerViewHolders> {
 
-    private String[] itemList;
+    private Media[] itemList;
     private Context context;
 
-    RecyclerViewAdapter(Context context, String[] itemList) {
+    RecyclerViewAdapter(Context context, Media[] itemList) {
         this.itemList = itemList;
         this.context = context;
     }
@@ -34,7 +35,7 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.Recyc
     @Override
     public void onBindViewHolder(RecyclerViewHolders holder, int position) {
         Picasso.with(context)
-                .load(itemList[position])
+                .load(itemList[position].getUrl())
                 .placeholder(R.mipmap.ic_launcher)
                 .fit()
                 .centerCrop()

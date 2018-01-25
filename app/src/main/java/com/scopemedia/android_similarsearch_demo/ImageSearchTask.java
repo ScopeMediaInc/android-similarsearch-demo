@@ -5,36 +5,32 @@ import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.util.Base64;
 
-import com.google.gson.Gson;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
+import com.scopemedia.api.client.ScopeCheckBuilder;
+import com.scopemedia.api.client.ScopeCheckClient;
+import com.scopemedia.api.request.SimilarImageRequest;
+import com.scopemedia.api.response.MediaResponse;
 
-import static com.scopemedia.android_similarsearch_demo.MainActivity.APPLICATION_ID;
+
+
 import static com.scopemedia.android_similarsearch_demo.MainActivity.CLIENT_ID;
 import static com.scopemedia.android_similarsearch_demo.MainActivity.CLIENT_SECRET;
+
 
 /**
  * @author Maikel Rehl on 3/8/2017.
  */
-class ImageSearchTask extends AsyncTask<String, Void, ImageResult> {
-    private static final String SEARCH_URL = "https://api.scopemedia.com/search-service/api/v1/"
-            + "search/similar?client_id=" + CLIENT_ID + "&client_secret=" + CLIENT_SECRET;
-
-    private static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+class ImageSearchTask extends AsyncTask<String, Void, MediaResponse> {
+    private static ScopeCheckClient client;
 
     private ImageSearchCallback callback;
     private boolean error = false;
 
+    static {
+        client = new ScopeCheckBuilder(CLIENT_ID, CLIENT_SECRET).build();
+    }
     ImageSearchTask(ImageSearchCallback callback) {
         this.callback = callback;
         if (this.callback == null) {
@@ -49,47 +45,38 @@ class ImageSearchTask extends AsyncTask<String, Void, ImageResult> {
     }
 
     @Override
-    protected ImageResult doInBackground(String... params) {
+    protected MediaResponse doInBackground(String... params) {
         try {
-            String encodedImage = encodeImage(params[0]);
-            JSONObject bodyParams = new JSONObject();
-            bodyParams.put("appId", APPLICATION_ID);
-            bodyParams.put("encodedMediaFile", encodedImage);
-
-            OkHttpClient client = new OkHttpClient();
-            RequestBody body = RequestBody.create(JSON, bodyParams.toString());
-            Request request = new Request.Builder()
-                    .url(SEARCH_URL)
-                    .post(body)
-                    .build();
-            Response response = client.newCall(request).execute();
-
-            if (response.code() >= 400) {
+            String encodedImage = encodeImageInBase64(params[0]);
+            SimilarImageRequest request = new SimilarImageRequest();
+            request.setMediaAsBase64(encodedImage);
+            MediaResponse response = client.getSimilarImages(request).performSync();
+            if (response == null || response.getCode() != 200) {
                 error = true;
             }
-            else {
-                Gson gson = new Gson();
-                return gson.fromJson(response.body().string(), ImageResult.class);
-            }
-        } catch (IOException | JSONException e) {
+            return response;
+        } catch (IOException e) {
             e.printStackTrace();
             error = true;
+            MediaResponse errRes = new MediaResponse();
+            errRes.setCode(-1);
+            errRes.setMessage(e.getMessage());
+            return errRes;
         }
-        return null;
     }
 
     @Override
-    protected void onPostExecute(ImageResult imageResult) {
-        super.onPostExecute(imageResult);
+    protected void onPostExecute(MediaResponse response) {
+        super.onPostExecute(response);
 
         if (error)
-            callback.error("Sorry something went wrong");
+            callback.error(response.getMessage());
         else {
-            callback.result(imageResult);
+            callback.result(response);
         }
     }
 
-    private String encodeImage(String path) {
+    private String encodeImageInBase64(String path) {
         Bitmap bm = BitmapFactory.decodeFile(path);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         bm.compress(Bitmap.CompressFormat.JPEG, 100, baos); //bm is the bitmap object

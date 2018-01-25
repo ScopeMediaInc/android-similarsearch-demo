@@ -18,16 +18,16 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
+import com.scopemedia.api.response.MediaResponse;
 
 /**
  * @author Maikel Rehl on 3/8/2017.
  */
 public class MainActivity extends AppCompatActivity implements ImageSearchCallback {
 
-    // YOUR CONFIGURATION
+    // @TODO SET YOUR OWN CONFIGURATION
     public static final String CLIENT_ID = "demo";
     public static final String CLIENT_SECRET = "demotestsecret";
-    public static final String APPLICATION_ID = "fashion";
 
     private static final int PERMISSION_REQUEST_CODE = 10;
     private static final int GALLERY_REQUEST_CODE = 20;
@@ -82,7 +82,7 @@ public class MainActivity extends AppCompatActivity implements ImageSearchCallba
     }
 
     @Override
-    public void result(ImageResult imageResult) {
+    public void result(MediaResponse imageResult) {
         if (imageResult == null || imageResult.getMedias() == null) return;
         RecyclerViewAdapter rcAdapter = new RecyclerViewAdapter(MainActivity.this, imageResult.getMedias());
         rView.setAdapter(rcAdapter);
