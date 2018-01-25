@@ -26,8 +26,8 @@ import com.scopemedia.api.response.MediaResponse;
 public class MainActivity extends AppCompatActivity implements ImageSearchCallback {
 
     // @TODO SET YOUR OWN CONFIGURATION
-    public static final String CLIENT_ID = "demo";
-    public static final String CLIENT_SECRET = "demotestsecret";
+    public static final String CLIENT_ID = null;
+    public static final String CLIENT_SECRET = null;
 
     private static final int PERMISSION_REQUEST_CODE = 10;
     private static final int GALLERY_REQUEST_CODE = 20;
@@ -108,7 +108,12 @@ public class MainActivity extends AppCompatActivity implements ImageSearchCallba
                 String picturePath = cursor.getString(columnIndex);
                 cursor.close();
 
-                searchBase64(picturePath, this);
+                try {
+                    searchBase64(picturePath, this);
+                }
+                catch (IllegalArgumentException e) {
+                    Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
+                }
             }
         }
     }

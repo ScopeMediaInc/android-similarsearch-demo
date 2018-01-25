@@ -36,6 +36,9 @@ class ImageSearchTask extends AsyncTask<String, Void, MediaResponse> {
         if (this.callback == null) {
             throw new IllegalArgumentException("Please set ImageSearchCallback");
         }
+        if (CLIENT_ID == null || CLIENT_SECRET == null) {
+            throw new IllegalArgumentException("Please register to get CLIENT_ID and CLIENT_SECRET");
+        }
     }
 
     @Override
