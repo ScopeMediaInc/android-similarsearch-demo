@@ -47,6 +47,7 @@ class ImageSearchTask extends AsyncTask<String, Void, MediaResponse> {
     @Override
     protected MediaResponse doInBackground(String... params) {
         try {
+            //@TODO need to reduce the image to make sure long side less than 500px, otherwise will receive timeout error
             String encodedImage = encodeImageInBase64(params[0]);
             SimilarImageRequest request = new SimilarImageRequest();
             request.setMediaAsBase64(encodedImage);
