@@ -8,8 +8,8 @@ import android.util.Base64;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-import com.scopemedia.api.client.ScopeCheckBuilder;
-import com.scopemedia.api.client.ScopeCheckClient;
+import com.scopemedia.api.client.ScopeAIBuilder;
+import com.scopemedia.api.client.ScopeAIClient;
 import com.scopemedia.api.request.SimilarImageRequest;
 import com.scopemedia.api.response.MediaResponse;
 
@@ -23,13 +23,13 @@ import static com.scopemedia.android_similarsearch_demo.MainActivity.CLIENT_SECR
  * @author Maikel Rehl on 3/8/2017.
  */
 class ImageSearchTask extends AsyncTask<String, Void, MediaResponse> {
-    private static ScopeCheckClient client;
+    private static ScopeAIClient client;
 
     private ImageSearchCallback callback;
     private boolean error = false;
 
     static {
-        client = new ScopeCheckBuilder(CLIENT_ID, CLIENT_SECRET).build();
+        client = new ScopeAIBuilder(CLIENT_ID, CLIENT_SECRET).build();
     }
     ImageSearchTask(ImageSearchCallback callback) {
         this.callback = callback;
